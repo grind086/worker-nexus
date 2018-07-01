@@ -32,6 +32,9 @@ export class NexusClient<T extends WorkerMessages<T>> {
 
     /**
      * Sends a simple message.
+     * @param name The message type
+     * @param data The data to send in the message
+     * @param transfer An array of items to transfer
      */
     public send<K extends keyof InputMessages<T>>(name: K, data: MessageInputType<T[K]>, transfer?: any[]) {
         this._postMessage({ data, name: <string>name, type: DATA_MESSAGE.INPUT }, transfer);
@@ -39,6 +42,9 @@ export class NexusClient<T extends WorkerMessages<T>> {
 
     /**
      * Runs a procedure.
+     * @param name The procedure name
+     * @param data The input data for the procedure
+     * @param transfer An array of items to transfer
      */
     public run<K extends keyof ProcedureMessages<T>>(
         name: K,

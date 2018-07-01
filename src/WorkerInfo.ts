@@ -1,5 +1,8 @@
-import { PortInfo } from "./interfaces";
+import { PortInfo } from './interfaces';
 
+/**
+ * A simple container for a worker and its ports
+ */
 export class WorkerInfo {
     public get totalPortCount() {
         return this.ports.length + this.pendingPorts;
@@ -13,7 +16,7 @@ export class WorkerInfo {
         return this.totalPortCount - this.availablePortCount;
     }
 
-    public ports: PortInfo['id'][] = [];
+    public ports: Array<PortInfo['id']> = [];
     public availablePorts: PortInfo[] = [];
     public pendingPorts = 0;
 

@@ -8,23 +8,22 @@ import {
     NexusClientProvider,
     NexusInternalMessage,
     NexusMessages,
+    PortInfo,
     ProcedureMessages,
     WorkerDataMessage,
     WorkerInternalMessage,
-    WorkerMessages,
-    PortInfo
+    WorkerMessages
 } from './interfaces';
 import { NexusClient } from './NexusClient';
 import { RequestManager } from './RequestManager';
 
 /**
  * The Nexus worker context. Should be instantiated in a worker by passing the native worker object.
+ * @param nativeWorker The native Worker object (usually `self` in the global context)
  */
-export class NexusWorker<
-    T extends NexusMessages<T>,
-    K extends keyof T,
-    M extends WorkerMessages<M> = T[K]
-> implements NexusClientProvider<T> {
+export class NexusWorker<T extends NexusMessages<T>, K extends keyof T, M extends WorkerMessages<M> = T[K]>
+    implements NexusClientProvider<T> {
+    /** Set to true to allow only a single data port to be created */
     public exclusive: boolean;
 
     private _nativeWorker: Worker;
@@ -83,6 +82,9 @@ export class NexusWorker<
         this._runHandlers.set(<string>name, handler);
     }
 
+    /**
+     * Request a `NexusClient` for a worker with the given name.
+     */
     public requestClient<N extends keyof T>(name: N): Promise<NexusClient<T[N]>> {
         const { reqid, promise } = this._requests.create();
 
@@ -102,13 +104,17 @@ export class NexusWorker<
 
         this._requests.resolve(
             reqid,
-            new NexusClient(port.port, () => this._postInternalMessage({ port, type: INTERNAL_MESSAGE.DATA_PORT_RELEASE }, [port.port]))
+            new NexusClient(port.port, () =>
+                this._postInternalMessage({ port, type: INTERNAL_MESSAGE.DATA_PORT_RELEASE }, [port.port])
+            )
         );
     }
 
     private _createDataPort(): PortInfo {
         const { port1: localPort, port2: remotePort } = new MessageChannel();
-        const id = Math.random().toString(16).slice(2);
+        const id = Math.random()
+            .toString(16)
+            .slice(2);
 
         this._dataPorts.set(id, localPort);
         this._dataSessions.set(localPort, 0);

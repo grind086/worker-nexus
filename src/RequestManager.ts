@@ -1,8 +1,6 @@
 import { Deferred } from './Deferred';
 import { RequestId } from './interfaces';
 
-// let nextManagerId = 0;
-
 export class RequestManager {
     // private _managerId: number;
     private _nextRequestId: number;

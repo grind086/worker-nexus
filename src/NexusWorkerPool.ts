@@ -1,5 +1,5 @@
 import { Deferred } from './Deferred';
-import { INTERNAL_MESSAGE, NexusInternalMessage, WorkerInternalMessage, WorkerMessages, PortInfo } from './interfaces';
+import { INTERNAL_MESSAGE, NexusInternalMessage, PortInfo, WorkerInternalMessage, WorkerMessages } from './interfaces';
 import { Nexus } from './Nexus';
 import { NexusClient } from './NexusClient';
 import { RequestManager } from './RequestManager';
