@@ -130,6 +130,7 @@ export class NexusWorker<T extends NexusMessages<T>, K extends keyof T, M extend
         if (localPort) {
             localPort.onmessage = null;
             this._dataPorts.delete(port.id);
+            this._dataSessions.delete(port.port);
         }
     }
 
