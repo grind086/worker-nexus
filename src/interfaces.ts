@@ -141,6 +141,19 @@ export type WorkerInternalMessage =
 //
 //
 
+export type NexusConfig<T extends NexusMessages<T>> = { [K in keyof T]: PoolConfig };
+
+export interface PoolConfig {
+    ctor: () => WorkerLike;
+    maxPorts: number;
+    maxWorkers: number;
+}
+
+export interface WorkerLike {
+    onmessage: ((ev: MessageEvent) => any) | null;
+    postMessage(message: any, transfer?: any[]): void;
+}
+
 export interface NexusClientProvider<T extends NexusMessages<T>> {
     requestClient<K extends keyof T>(name: K): Promise<NexusClient<T[K]>>;
 }

@@ -2,20 +2,13 @@ import {
     MessageInputType,
     MessageOutputType,
     NexusClientProvider,
+    NexusConfig,
     NexusMessages,
     PortInfo,
     ProcedureMessages
 } from './interfaces';
 import { NexusClient } from './NexusClient';
 import { NexusWorkerPool } from './NexusWorkerPool';
-
-type NexusConfig<T extends NexusMessages<T>> = {
-    [K in keyof T]: {
-        ctor: () => Worker;
-        maxWorkers: number;
-        maxPorts: number;
-    }
-};
 
 export class Nexus<T extends NexusMessages<T>> implements NexusClientProvider<T> {
     public get config() {

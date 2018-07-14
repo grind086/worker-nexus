@@ -12,6 +12,7 @@ import {
     ProcedureMessages,
     WorkerDataMessage,
     WorkerInternalMessage,
+    WorkerLike,
     WorkerMessages
 } from './interfaces';
 import { NexusClient } from './NexusClient';
@@ -26,7 +27,7 @@ export class NexusWorker<T extends NexusMessages<T>, K extends keyof T, M extend
     /** Set to true to allow only a single data port to be created */
     public exclusive: boolean;
 
-    private _nativeWorker: Worker;
+    private _nativeWorker: WorkerLike;
     private _dataPorts: Map<string, MessagePort>; // <Remote, Local>
     private _dataSessions: Map<MessagePort, number>; // <Local, sessionId>
 
@@ -40,7 +41,7 @@ export class NexusWorker<T extends NexusMessages<T>, K extends keyof T, M extend
         ) => void
     >;
 
-    constructor(nativeWorker: Worker) {
+    constructor(nativeWorker: WorkerLike) {
         this.exclusive = false;
 
         this._nativeWorker = nativeWorker;

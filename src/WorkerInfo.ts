@@ -1,4 +1,4 @@
-import { PortInfo } from './interfaces';
+import { PortInfo, WorkerLike } from './interfaces';
 
 /**
  * A simple container for a worker and its ports
@@ -20,7 +20,7 @@ export class WorkerInfo {
     public availablePorts: PortInfo[] = [];
     public pendingPorts = 0;
 
-    constructor(public worker: Worker) {}
+    constructor(public worker: WorkerLike) {}
 
     public owns(info: PortInfo) {
         return this.ports.includes(info.id);

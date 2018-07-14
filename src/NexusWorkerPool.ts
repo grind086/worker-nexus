@@ -1,15 +1,17 @@
 import { Deferred } from './Deferred';
-import { INTERNAL_MESSAGE, NexusInternalMessage, PortInfo, WorkerInternalMessage, WorkerMessages } from './interfaces';
+import {
+    INTERNAL_MESSAGE,
+    NexusInternalMessage,
+    PoolConfig,
+    PortInfo,
+    WorkerInternalMessage,
+    WorkerLike,
+    WorkerMessages
+} from './interfaces';
 import { Nexus } from './Nexus';
 import { NexusClient } from './NexusClient';
 import { RequestManager } from './RequestManager';
 import { WorkerInfo } from './WorkerInfo';
-
-interface PoolConfig {
-    ctor: () => Worker;
-    maxPorts: number;
-    maxWorkers: number;
-}
 
 // tslint:disable-next-line:max-classes-per-file
 export class NexusWorkerPool<T extends WorkerMessages<T>> {
@@ -17,7 +19,7 @@ export class NexusWorkerPool<T extends WorkerMessages<T>> {
     public maxWorkers: number;
 
     private _nexus: Nexus<any>;
-    private _ctor: () => Worker;
+    private _ctor: () => WorkerLike;
     private _requests: RequestManager;
     private _portQueue: Array<Deferred<PortInfo>>;
     private _workers: WorkerInfo[];
@@ -115,11 +117,11 @@ export class NexusWorkerPool<T extends WorkerMessages<T>> {
         return leastUsedWorker;
     }
 
-    private _postInternalMessage(worker: Worker, message: WorkerInternalMessage, transfer?: any[]) {
+    private _postInternalMessage(worker: WorkerLike, message: WorkerInternalMessage, transfer?: any[]) {
         worker.postMessage(message, transfer);
     }
 
-    private _handleInternalMessage(worker: Worker, message: NexusInternalMessage) {
+    private _handleInternalMessage(worker: WorkerLike, message: NexusInternalMessage) {
         switch (message.type) {
             case INTERNAL_MESSAGE.DATA_PORT_REQUEST:
                 this._nexus.requestPort(message.name).then(
