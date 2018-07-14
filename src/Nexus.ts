@@ -1,4 +1,11 @@
-import { NexusClientProvider, NexusMessages, PortInfo } from './interfaces';
+import {
+    MessageInputType,
+    MessageOutputType,
+    NexusClientProvider,
+    NexusMessages,
+    PortInfo,
+    ProcedureMessages
+} from './interfaces';
 import { NexusClient } from './NexusClient';
 import { NexusWorkerPool } from './NexusWorkerPool';
 
@@ -29,6 +36,37 @@ export class Nexus<T extends NexusMessages<T>> implements NexusClientProvider<T>
         }
     }
 
+    /**
+     * Runs a procedure on the next available client of the given type.
+     * @param workerName The worker name
+     * @param procedureName The procedure name
+     * @param data The input data for the procedure
+     * @param transfer An array of items to transfer
+     */
+    public run<U extends keyof T, V extends keyof ProcedureMessages<T[U]>>(
+        workerName: U,
+        procedurename: V,
+        data: MessageInputType<T[U][V]>,
+        transfer?: any[]
+    ): Promise<MessageOutputType<T[U][V]>> {
+        return this.requestClient(workerName).then(client =>
+            client.run(procedurename, data, transfer).then(
+                result => {
+                    client.release();
+                    return result;
+                },
+                error => {
+                    client.release();
+                    return Promise.reject(error);
+                }
+            )
+        );
+    }
+
+    /**
+     * Gets an instance of the given worker type
+     * @param name The worker type
+     */
     public requestClient<K extends keyof T>(name: K): Promise<NexusClient<T[K]>> {
         let once = false;
 
@@ -43,6 +81,10 @@ export class Nexus<T extends NexusMessages<T>> implements NexusClientProvider<T>
         );
     }
 
+    /**
+     * Gets a data port for a worker of the given type
+     * @param name The worker type
+     */
     public requestPort(name: keyof T) {
         const pool = this._workerPools.get(name);
 
@@ -56,6 +98,9 @@ export class Nexus<T extends NexusMessages<T>> implements NexusClientProvider<T>
         });
     }
 
+    /**
+     * Releases the given port
+     */
     public releasePort(port: PortInfo) {
         const pool = this._portToPool.get(port.id);
 
