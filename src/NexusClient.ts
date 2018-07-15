@@ -13,7 +13,7 @@ import { RequestManager } from './RequestManager';
 /**
  * A client interface for one of the Nexus' workers.
  */
-export class NexusClient<T extends WorkerMessages<T>> {
+export class NexusClient<T extends WorkerMessages> {
     private _port: MessagePort;
     private _release: () => void;
     private _wasReleased: boolean;

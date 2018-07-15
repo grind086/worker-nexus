@@ -22,7 +22,7 @@ import { RequestManager } from './RequestManager';
  * The Nexus worker context. Should be instantiated in a worker by passing the native worker object.
  * @param nativeWorker The native Worker object (usually `self` in the global context)
  */
-export class NexusWorker<T extends NexusMessages<T>, K extends keyof T, M extends WorkerMessages<M> = T[K]>
+export class NexusWorker<T extends NexusMessages, K extends keyof T, M extends WorkerMessages = T[K]>
     implements NexusClientProvider<T> {
     /** Set to true to allow only a single data port to be created */
     public exclusive: boolean;

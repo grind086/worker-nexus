@@ -14,7 +14,7 @@ import { RequestManager } from './RequestManager';
 import { WorkerInfo } from './WorkerInfo';
 
 // tslint:disable-next-line:max-classes-per-file
-export class NexusWorkerPool<T extends WorkerMessages<T>> {
+export class NexusWorkerPool<T extends WorkerMessages> {
     public maxPorts: number;
     public maxWorkers: number;
 

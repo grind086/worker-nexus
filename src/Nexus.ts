@@ -10,7 +10,7 @@ import {
 import { NexusClient } from './NexusClient';
 import { NexusWorkerPool } from './NexusWorkerPool';
 
-export class Nexus<T extends NexusMessages<T>> implements NexusClientProvider<T> {
+export class Nexus<T extends NexusMessages> implements NexusClientProvider<T> {
     public get config() {
         return this._config;
     }

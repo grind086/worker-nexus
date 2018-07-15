@@ -31,19 +31,20 @@ export type Message = InputMessage | OutputMessage | ProcedureMessage;
 export type MessageInputType<T extends Message> = T extends InputMessage ? T['input'] : never;
 export type MessageOutputType<T extends Message> = T extends OutputMessage ? T['output'] : never;
 
-export type WorkerMessages<T extends WorkerMessages<T>> = { [K in keyof T]: Message };
+export interface WorkerMessages {
+    [type: string]: Message;
+}
 
-export type ProcedureMessages<T extends WorkerMessages<T>> = PickProperties<T, ProcedureMessage>;
-export type InputMessages<T extends WorkerMessages<T>> = PickProperties<
-    OmitProperties<T, ProcedureMessage>,
-    InputMessage
->;
-export type OutputMessages<T extends WorkerMessages<T>> = PickProperties<
+export type ProcedureMessages<T extends WorkerMessages> = PickProperties<T, ProcedureMessage>;
+export type InputMessages<T extends WorkerMessages> = PickProperties<OmitProperties<T, ProcedureMessage>, InputMessage>;
+export type OutputMessages<T extends WorkerMessages> = PickProperties<
     OmitProperties<T, ProcedureMessage>,
     OutputMessage
 >;
 
-export type NexusMessages<T extends NexusMessages<T>> = { [K in keyof T]: WorkerMessages<T[K]> };
+export interface NexusMessages {
+    [worker: string]: WorkerMessages;
+}
 
 //
 // (Internal) Aliases
@@ -141,7 +142,7 @@ export type WorkerInternalMessage =
 //
 //
 
-export type NexusConfig<T extends NexusMessages<T>> = { [K in keyof T]: PoolConfig };
+export type NexusConfig<T extends NexusMessages> = { [K in keyof T]: PoolConfig };
 
 export interface PoolConfig {
     ctor: () => WorkerLike;
@@ -154,6 +155,6 @@ export interface WorkerLike {
     postMessage(message: any, transfer?: any[]): void;
 }
 
-export interface NexusClientProvider<T extends NexusMessages<T>> {
+export interface NexusClientProvider<T extends NexusMessages> {
     requestClient<K extends keyof T>(name: K): Promise<NexusClient<T[K]>>;
 }
