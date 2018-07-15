@@ -1,11 +1,14 @@
 {
   "name": "worker-nexus",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A library for managing worker networks",
   "main": "dist/index.js",
   "author": "Rob Grindeland",
   "license": "MIT",
   "homepage": "https://github.com/grind086/worker-nexus",
+  "files": [
+    "dist/**/*"
+  ],
   "scripts": {
     "build": "tsc",
     "watch": "tsc --watch",
