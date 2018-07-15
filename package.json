@@ -5,9 +5,11 @@
   "main": "dist/index.js",
   "author": "Rob Grindeland",
   "license": "MIT",
+  "homepage": "https://github.com/grind086/worker-nexus",
   "scripts": {
     "build": "tsc",
-    "watch": "tsc --watch"
+    "watch": "tsc --watch",
+    "lint": "tslint -p ./tsconfig.json"
   },
   "devDependencies": {
     "prettier": "^1.13.7",
@@ -15,6 +17,6 @@
     "tslint-config-prettier": "^1.13.0",
     "tslint-consistent-codestyle": "^1.13.1",
     "tslint-plugin-prettier": "^1.3.0",
-    "typescript": "^2.9.2"
+    "typescript": "^3.0.0-rc"
   }
 }

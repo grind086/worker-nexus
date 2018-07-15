@@ -1,5 +1,5 @@
 .vscode/
-node_modules/
-dist/
+src/
+.gitignore
 yarn-error.log
 npm-error.log
