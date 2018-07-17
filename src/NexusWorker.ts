@@ -21,6 +21,7 @@ import { RequestManager } from './RequestManager';
 /**
  * The Nexus worker context. Should be instantiated in a worker by passing the native worker object.
  * @param nativeWorker The native Worker object (usually `self` in the global context)
+ * @param asyncStartup If `true` internal messages will be held in a queue until `#start()` is called.
  */
 export class NexusWorker<T extends NexusMessages, K extends keyof T, M extends WorkerMessages = T[K]>
     implements NexusClientProvider<T> {
@@ -31,6 +32,7 @@ export class NexusWorker<T extends NexusMessages, K extends keyof T, M extends W
     private _dataPorts: Map<string, MessagePort>; // <Remote, Local>
     private _dataSessions: Map<MessagePort, number>; // <Local, sessionId>
 
+    private _messageQueue: WorkerInternalMessage[] | null;
     private _requests: RequestManager;
     private _sendHandlers: Map<string, (data: MessageInputType<M[keyof M]>) => void>;
     private _runHandlers: Map<
@@ -41,18 +43,35 @@ export class NexusWorker<T extends NexusMessages, K extends keyof T, M extends W
         ) => void
     >;
 
-    constructor(nativeWorker: WorkerLike) {
+    constructor(nativeWorker: WorkerLike, asyncStartup: boolean = false) {
         this.exclusive = false;
 
         this._nativeWorker = nativeWorker;
         this._dataPorts = new Map();
         this._dataSessions = new Map();
 
+        this._messageQueue = asyncStartup ? [] : null;
         this._requests = new RequestManager();
         this._sendHandlers = new Map();
         this._runHandlers = new Map();
 
         nativeWorker.onmessage = event => this._handleInternalMessage(event.data);
+    }
+
+    /**
+     * Start processing and responding to internal messages
+     */
+    public start() {
+        if (!this._messageQueue) {
+            return;
+        }
+
+        const messages = this._messageQueue.reverse();
+        this._messageQueue = null;
+
+        for (const message of messages) {
+            this._handleInternalMessage(message);
+        }
     }
 
     /**
@@ -183,6 +202,11 @@ export class NexusWorker<T extends NexusMessages, K extends keyof T, M extends W
     }
 
     private _handleInternalMessage(message: WorkerInternalMessage) {
+        if (this._messageQueue) {
+            this._messageQueue.push(message);
+            return;
+        }
+
         switch (message.type) {
             case INTERNAL_MESSAGE.DATA_PORT_REQUEST:
                 if (this.exclusive && this._dataPorts.size > 0) {
